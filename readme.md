@@ -1,86 +1,163 @@
-# 📦 API Escolar – CI/CD com Docker e GitHub Actions
+# 🚀 Aula 03 - Imersão Cloud DevOps (Alura + Google Cloud)
 
-Este projeto foi desenvolvido como parte da **Imersão Cloud DevOps**, evolução do repositório [`api-escolar-fastapi-docker`](https://github.com/ronayrton/api-escolar-fastapi-docker), com foco em práticas modernas de **DevOps** como **Integração Contínua (CI)** e **Entrega Contínua (CD)**.
-
----
-
-## 🚀 Objetivos
-
-- Automatizar o ciclo de vida da aplicação com GitHub Actions
-- Construir imagens Docker com boas práticas (sem usar `latest`)
-- Utilizar Docker Compose com volumes persistentes
-- Organizar o projeto com workflows no padrão `.github/workflows`
-- Integrar práticas recomendadas com apoio de **IA**
+Este projeto é baseado na Aula 03 da Imersão Cloud DevOps da Alura em parceria com a Google Cloud. O objetivo principal é realizar o **deploy automatizado de uma API FastAPI containerizada** na **Google Cloud Platform**, utilizando o **Cloud Run** e um pipeline de **CI/CD com GitHub Actions**.
 
 ---
 
-## 🧰 Tecnologias e ferramentas
+## 🛠 Tecnologias Utilizadas
 
-- **FastAPI**
-- **Docker & Docker Compose**
-- **GitHub Actions**
-- **CI/CD com pipelines**
-- **Volumes persistentes**
-- **Boas práticas orientadas**
-- **.github/workflows/main.yml**
-- **Extensão Gemini Code Assist (Google AI)**
-
----
-
-## 🤖 IA na prática
-
-Utilizei a **Extensão Gemini Code Assist** para:
-
-- Sugerir boas práticas no `Dockerfile`
-- Auxiliar na criação do `docker-compose.yml`
-- Gerar partes do workflow `.github/workflows/main.yml`
-- Validar variáveis de ambiente e organização da pipeline
+- Python + FastAPI
+- Docker
+- GitHub Actions
+- Google Cloud Platform:
+  - Cloud Run
+  - Artifact Registry
+  - Cloud Build (opcional)
+- Terraform (opcional)
 
 ---
 
-## 📦 Funcionalidades
+## 🎯 Objetivo
 
-- Criação de uma aplicação containerizada com Docker-compose
-- Evitar o uso da imagem `:latest` para garantir consistência e previsibilidade
-- Pipeline automatizada com GitHub Actions para:
-  - Build da imagem Docker
-  - Execução de testes automatizados
-  - Deploy automatizado (simulado ou real)
-- Estrutura `.github/workflows` bem definida e comentada
-
-
-## 🔁 CI/CD com GitHub Actions
-
-Workflow automatizado para:
-
-- 🔨 Build da imagem
-- ✅ Validação e testes (mock)
-- 🚀 Deploy (simulado)
-- 🔐 Uso de secrets e variáveis
-
-Local: `.github/workflows/main.yml`
+Realizar o deploy automatizado da aplicação com CI/CD utilizando GitHub Actions + GCP, simulando um ambiente real de entrega contínua.
 
 ---
 
-## 🧪 Execução local
+## 📦 Etapas do Projeto
+
+- [x] Containerizar aplicação com Docker
+- [x] Configurar pipeline de CI/CD com GitHub Actions
+- [x] Autenticar no Google Cloud
+- [x] Criar repositório no Artifact Registry
+- [x] Fazer build e push da imagem localmente
+- [x] Deploy no Cloud Run com imagem container
+- [ ] (Opcional) Provisionar recursos com Terraform
+
+---
+
+## 📁 Estrutura do Repositório
 
 ```bash
-git clone https://github.com/seu-usuario/api-escolar-ci-cd-github-actions.git
-cd api-escolar-ci-cd-github-actions
-docker-compose up -d
+📁 api-deploy-gcp
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
+├── app/
+├── Dockerfile
+├── requirements.txt   
+├── docker-compose.yml
+├── .dockerignore
+├── .gitignore
+└── README.md
 ```
-Acesse a API em: http://localhost:8000
 
+## 🔐 Autenticação no Google Cloud (manual)
+```bash
+gcloud auth login
+gcloud config set project imersao-devops-api
+```
 
-## 🚀 GitHub Actions
-Veja o workflow em .github/workflows/pipeline.yml. Ele é responsável por:
+## ☁️ Deploy com Cloud Build (opcional - usando --source .)
+```bash
+gcloud run deploy --source . --port=8000 --region us-central1 --allow-unauthenticated --project imersao-devops-api
+```
 
-- Construir a imagem com docker build
+## ❌ Possível erro:
+```bash
+ERROR: (gcloud.run.deploy) PERMISSION_DENIED: Build failed because the service account is missing required IAM permissions.
+```
 
-- Validar o código e rodar testes
+## 🔧 Solução:
+Conceda permissões à conta de serviço do Cloud Build:
 
-- Subir a imagem (caso real) para o DockerHub ou GitHub Container Registry
+```bash
+gcloud projects add-iam-policy-binding imersao-devops-api \
+  --member="serviceAccount:1034286558722@cloudbuild.gserviceaccount.com" \
+  --role="roles/run.admin"
 
-- Enviar alertas ou logs de execução
+gcloud projects add-iam-policy-binding imersao-devops-api \
+  --member="serviceAccount:1034286558722@cloudbuild.gserviceaccount.com" \
+  --role="roles/artifactregistry.writer"
+```
 
+### ✅ Deploy recomendado: Build local + Push para Artifact Registry + Deploy via imagem
 
+1. Ative o Artifact Registry
+bash
+Copiar
+Editar
+gcloud services enable artifactregistry.googleapis.com
+2. Crie o repositório Docker
+bash
+Copiar
+Editar
+gcloud artifacts repositories create containers \
+  --repository-format=docker \
+  --location=us-central1 \
+  --description="Repositório de containers da aplicação"
+3. Faça o build da imagem localmente
+bash
+Copiar
+Editar
+docker build -t us-central1-docker.pkg.dev/imersao-devops-api/containers/api:v1 .
+4. Autentique o Docker com o GCP
+bash
+Copiar
+Editar
+gcloud auth configure-docker us-central1-docker.pkg.dev
+5. Faça o push da imagem
+bash
+Copiar
+Editar
+docker push us-central1-docker.pkg.dev/imersao-devops-api/containers/api:v1
+6. Deploy no Cloud Run
+bash
+Copiar
+Editar
+gcloud run deploy api \
+  --image us-central1-docker.pkg.dev/imersao-devops-api/containers/api:v1 \
+  --region us-central1 \
+  --platform managed \
+  --allow-unauthenticated
+7. Verifique o endpoint gerado
+text
+Copiar
+Editar
+Service [api] revision [api-xxxx] has been deployed and is serving 100 percent of traffic at:
+https://api-xxxxx-uc.a.run.app
+Acesse esse link no navegador ou teste com curl.
+
+🔁 GitHub Actions CI/CD
+O deploy automatizado está configurado via GitHub Actions em .github/workflows/deploy.yml, que:
+
+Faz build da imagem Docker
+
+Faz push para o Artifact Registry
+
+Faz deploy no Cloud Run
+
+Verifique se os segredos GCP_SA_KEY, GCP_PROJECT_ID e GCP_REGION estão configurados no GitHub (Settings > Secrets and variables > Actions).
+
+✅ Vantagens da abordagem com imagem
+Item	Benefício
+Build local	Fácil de identificar e corrigir erros no Dockerfile
+Push para ArtifactRegistry	Controle de versões de imagens
+Deploy mais rápido	Sem depender do Cloud Build
+Fluxo realista de DevOps	Usado em ambientes com GitLab/GitHub CI/CD
+
+📌 Projeto GCP usado
+ID do Projeto: imersao-devops-api
+Região: us-central1
+
+📚 Recursos adicionais
+Documentação oficial Cloud Run
+
+FastAPI Docs
+
+Google Cloud CLI
+
+Alura - Imersão Cloud DevOps
+
+👨‍💻 Autor
+Projeto realizado como parte da Imersão Cloud DevOps (Alura + Google Cloud).
+Para fins de estudo, portfólio e prática de deploy automatizado com ferramentas modernas de DevOps.
