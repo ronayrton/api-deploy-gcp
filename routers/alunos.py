@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Union
-from app.schemas import Aluno
-from app.models import Aluno as ModelAluno
-from app.database import get_db
+from schemas import Aluno
+from models import Aluno as ModelAluno
+from database import get_db
 
 alunos_router = APIRouter()
 
