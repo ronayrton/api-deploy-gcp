@@ -71,9 +71,7 @@ ERROR: (gcloud.run.deploy) PERMISSION_DENIED: Build failed because the service a
 Conceda permissões à conta de serviço do Cloud Build:
 
 ```bash
-gcloud projects add-iam-policy-binding imersao-devops-api \
-  --member="serviceAccount:1034286558722@cloudbuild.gserviceaccount.com" \
-  --role="roles/run.admin"
+gcloud projects add-iam-policy-binding imersao-devops-api --member="serviceAccount:1034286558722@cloudbuild.gserviceaccount.com" --role="roles/run.admin"
 
 gcloud projects add-iam-policy-binding imersao-devops-api \
   --member="serviceAccount:1034286558722@cloudbuild.gserviceaccount.com" \
@@ -84,45 +82,37 @@ gcloud projects add-iam-policy-binding imersao-devops-api \
 
 1. Ative o Artifact Registry
 bash
-Copiar
-Editar
 gcloud services enable artifactregistry.googleapis.com
+
 2. Crie o repositório Docker
 bash
-Copiar
-Editar
 gcloud artifacts repositories create containers \
   --repository-format=docker \
   --location=us-central1 \
   --description="Repositório de containers da aplicação"
+
 3. Faça o build da imagem localmente
 bash
-Copiar
-Editar
 docker build -t us-central1-docker.pkg.dev/imersao-devops-api/containers/api:v1 .
+
 4. Autentique o Docker com o GCP
 bash
-Copiar
-Editar
 gcloud auth configure-docker us-central1-docker.pkg.dev
+
 5. Faça o push da imagem
 bash
-Copiar
-Editar
 docker push us-central1-docker.pkg.dev/imersao-devops-api/containers/api:v1
+
 6. Deploy no Cloud Run
 bash
-Copiar
-Editar
 gcloud run deploy api \
   --image us-central1-docker.pkg.dev/imersao-devops-api/containers/api:v1 \
   --region us-central1 \
   --platform managed \
   --allow-unauthenticated
+
 7. Verifique o endpoint gerado
 text
-Copiar
-Editar
 Service [api] revision [api-xxxx] has been deployed and is serving 100 percent of traffic at:
 https://api-xxxxx-uc.a.run.app
 Acesse esse link no navegador ou teste com curl.
@@ -161,3 +151,31 @@ Alura - Imersão Cloud DevOps
 👨‍💻 Autor
 Projeto realizado como parte da Imersão Cloud DevOps (Alura + Google Cloud).
 Para fins de estudo, portfólio e prática de deploy automatizado com ferramentas modernas de DevOps.
+
+
+gcloud projects add-iam-policy-binding imersao-devops-api --member="serviceAccount:github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com" --role="roles/artifactregistry.writer"
+### INTERFACE WEB GCP
+
+## Configure o segredo no GitHub novamente
+Crie um novo:
+Nome: GCP_SA_KEY
+Valor: cole todo o conteúdo do novo JSON (inclusive {})
+
+
+Confirme que os outros secrets estão ok
+GCP_PROJECT_ID → deve ser imersao-devops-api
+GCP_REGION → ex: southamerica-east1
+
+# Após recriar as credenciais mesmo erro de permissão
+
+PROJECT_ID="imersao-devops-api"
+SA_EMAIL="github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com"
+
+# Escrita no Artifact Registry
+gcloud projects add-iam-policy-binding imersao-devops-api  --member="serviceAccount:github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com"  --role="roles/artifactregistry.writer"
+
+# Permissão para gerenciar Cloud Run
+gcloud projects add-iam-policy-binding imersao-devops-api  --member="serviceAccount:github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com" --role="roles/run.admin"
+
+# Permissão para atuar como conta de serviço
+gcloud projects add-iam-policy-binding imersao-devops-api --member="serviceAccount:github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com"  --role="roles/iam.serviceAccountUser"
