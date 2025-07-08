@@ -73,9 +73,7 @@ Conceda permissões à conta de serviço do Cloud Build:
 ```bash
 gcloud projects add-iam-policy-binding imersao-devops-api --member="serviceAccount:1034286558722@cloudbuild.gserviceaccount.com" --role="roles/run.admin"
 
-gcloud projects add-iam-policy-binding imersao-devops-api \
-  --member="serviceAccount:1034286558722@cloudbuild.gserviceaccount.com" \
-  --role="roles/artifactregistry.writer"
+gcloud projects add-iam-policy-binding imersao-devops-api --member="serviceAccount:1034286558722@cloudbuild.gserviceaccount.com" --role="roles/artifactregistry.writer"
 ```
 
 ### ✅ Deploy recomendado: Build local + Push para Artifact Registry + Deploy via imagem
@@ -86,10 +84,7 @@ gcloud services enable artifactregistry.googleapis.com
 
 2. Crie o repositório Docker
 bash
-gcloud artifacts repositories create containers \
-  --repository-format=docker \
-  --location=us-central1 \
-  --description="Repositório de containers da aplicação"
+gcloud artifacts repositories create containers --repository-format=docker --location=us-central1  --description="Repositório de containers da aplicação"
 
 3. Faça o build da imagem localmente
 bash
@@ -179,3 +174,33 @@ gcloud projects add-iam-policy-binding imersao-devops-api  --member="serviceAcco
 
 # Permissão para atuar como conta de serviço
 gcloud projects add-iam-policy-binding imersao-devops-api --member="serviceAccount:github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com"  --role="roles/iam.serviceAccountUser"
+
+
+
+PROJECT_ID="imersao-devops-api"
+GITHUB_SA="github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com"
+COMPUTE_SA="$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")-compute@developer.gserviceaccount.com"
+
+gcloud iam service-accounts add-iam-policy-binding $COMPUTE_SA \
+  --member="serviceAccount:$GITHUB_SA" \
+  --role="roles/iam.serviceAccountUser" \
+  --project=$PROJECT_ID
+
+
+## ❌Erro no deploy
+
+✅ Tradução:
+O GitHub Actions conseguiu autenticar com sua conta de serviço, mas ela não tem permissão para usar outra conta de serviço, que é a usada pelo Cloud Run por padrão (PROJECT_NUMBER-compute@developer.gserviceaccount.com).
+
+
+✅ Solução: conceder roles/iam.serviceAccountUser
+Execute este comando no terminal:
+
+bash
+PROJECT_ID="imersao-devops-api"
+GITHUB_SA="github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com"
+COMPUTE_SA="$(gcloud projects describe $imersao-devops-api --format="value(projectNumber)")-compute@developer.gserviceaccount.com"
+
+gcloud iam service-accounts add-iam-policy-binding (gcloud projects describe $imersao-devops-api --format="value(projectNumber)")-compute@developer.gserviceaccount.com --member="serviceAccount:github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com" --role="roles/iam.serviceAccountUser" --project=$imersao-devops-api
+
+1034286558722-compute@developer.gserviceaccount.com
