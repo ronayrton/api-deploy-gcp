@@ -8,7 +8,7 @@ from routers.matriculas import matriculas_router
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="API de Gestão Escolar no CLOUD RUN ", 
+    title="API de Gestão Escolar", 
     description="""
         Esta API fornece endpoints para gerenciar alunos, cursos e turmas, em uma instituição de ensino.  
         
