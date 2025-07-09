@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "escolar-devops-001",
+  "private_key_id": "b19da507ae4c7c3af5fbc2d17e77b600cfd29ac1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCwk94kp4bJ03hX\n3RBHPnnLPMXzx3uOxjwBtOLQ/AO9zg+cJUV7f8l/K9WwmwT1BUYRi668riHL+cME\niQTvK9KuQp7AaWyq0FONJrEXfVvlPaUEUD7cOkE2N6k3bcMvKM8WyALX/k5S/2Ji\nHNP3ZfqiwRCV9f/o4uqN3sLkyUzTGqtM/yphvv4Woi30RX8dODQZ4hf7fKeWJCB8\nTkjTQzFpZyqXYCsVCR3tnXBm1vdeVOn7XYpRuhMJx6omfTJndJC14d5nw7Z7X7sk\nZdaeDVm0ZqVGVm5eQoBmSY6k0kui5OjsQsiESx14SmG+Zg6QKcBlp4nmR+bmL81M\nsQTEDHMDAgMBAAECggEAVSOe/z51e7gGtRrGgAuMLyYI7k+XcFJ92XbNzGVPKoQC\nO9AuzeriDXrlyIceX0PhMpGOubQeYJr3YKbuZaHULii6Id1TQ5M6TftDdSeBGSnd\neJR2krpV+h3hbfPzIjiDjaD32gxo2JUB63up6oZV0IbVh/D6qOBMpwYrI6Q58ikD\nLVBgfQ9cci+dyo3uUsYIoJB/3FgZSNbCyko1glvHeRGN425q6rKfMCPrnXjpJ2mL\na4AV8YJaUlpuyn4fBk3tr4TetlrV6S+mcQujgAjWGl8vhd9uUHDGKzxbly36Wifv\nE3Dfx9wC9EoAK8ygwsQqhOhGRh7quOQRVKZc5CPiTQKBgQDZfgyiA3DeHCEQPqEN\nur+5NA2p2gJG9bNFh+IyYjNQUDswreWkjabAGQTPBANtajD6dVfOkLfwsmRasDtK\nuwnSa6YMTA/uuBOJHTtmCOiHR/GBu69xFjRAv2q5dPSPwBBYt+tBuZ/CupGFJloI\n/ETugtgg5Cek+aIaF/7hD2Hh7QKBgQDP11YA0gbWLrvJWjZXhwNb6L3BR9vVBiU3\nMFDaNyBqZNWj18pxZDEEjx8wPirUk7lc+AyqJAd+nVRKC/jPXKBwfyv6AXk+35p5\nXw+rGPmfzOgInbxKXPwiDq9/as6qQqjOSEvJKyaJpEWeo+BqYVJLtcjJLDYRV27P\nySobz5bKrwKBgQCak/cAkzd99ToepJStAGTRiciIRtVFf815hpliu97CnzNiZsYH\njVHNyDpds/mHo2jKKepNexfwr6mZtxV9CLBzaGUs6kaMoTHpSuhznbM+qwhf73hD\nBMgAmMuOoixLmvNDSvyeywJcUWOp4dct+bY4WrCnt+DhZTcsGo/hf6BPBQKBgCuq\nmTYY6jjLnsaB/pLLGeiQcHWQLF6IKP98VjBSjqvrvXrr1muWWjoT+8B9/y+kTbh7\noOWKJkzyrwfTlhWy5z5baZjgAGI2RlUjpL4UxDVPrpxIz4tsF8jr/vEtNnhNAvw7\n8jg0qacXbU0ULw0Kn2iqq6GgeUeRcAWVxRQMvCifAoGBAJ3OjIAq0KvEyxbhOee7\nHza868hU5bwR2APuu3mUbueRhBfNNKoAXGKiK8wmIWNnaR3q5gIySxoTs4yX+Y2n\nblN0caaK6DvQgvuAF96IGF4Zho0OMvXLcpEm5GqaPcDoTDyOzrGhnP1NnsVffrnJ\nopTK9qhpezDDaq2/sO1A/KnP\n-----END PRIVATE KEY-----\n",
+  "client_email": "github-actions@escolar-devops-001.iam.gserviceaccount.com",
+  "client_id": "117732013411079448681",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/github-actions%40escolar-devops-001.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
