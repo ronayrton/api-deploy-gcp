@@ -1,17 +1,17 @@
-name: Deploy API to Google Cloud Run
+name: Deploy API to Cloud Run
 
 on:
   push:
     branches:
-      - main  # ou outro branch de produção
+      - main
 
 jobs:
   deploy:
-    name: Deploy to Cloud Run
+    name: Build and Deploy to Cloud Run
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
+      - name: Checkout do código
         uses: actions/checkout@v4
 
       - name: Autenticar no Google Cloud
@@ -22,17 +22,17 @@ jobs:
       - name: Configurar o gcloud
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: SEU_PROJECT_ID
+          project_id: api-devops-ronayrton
           install_components: 'beta'
 
-      - name: Construir e enviar imagem para o Artifact Registry
+      - name: Enviar imagem para Artifact Registry
         run: |
-          gcloud builds submit --tag us-central1-docker.pkg.dev/api-imersao-devops/api-docker/api:latest
+          gcloud builds submit --tag us-central1-docker.pkg.dev/api-devops-ronayrton/api-docker/api:latest
 
       - name: Fazer deploy no Cloud Run
         run: |
-          gcloud run deploy NOME-DO-SERVICO \
-            --image REGIAO-docker.pkg.dev/PROJETO-ID/NOME-REPOSITORIO/api:latest \
-            --region REGIAO \
+          gcloud run deploy api-devops \
+            --image us-central1-docker.pkg.dev/api-devops-ronayrton/api-docker/api:latest \
+            --region us-central1 \
             --platform managed \
             --allow-unauthenticated
