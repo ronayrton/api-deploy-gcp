@@ -1,206 +1,180 @@
-# 🚀 Aula 03 - Imersão Cloud DevOps (Alura + Google Cloud)
+# 📘 API de Gestão Escolar com FastAPI + CI/CD no Google Cloud Run
 
-Este projeto é baseado na Aula 03 da Imersão Cloud DevOps da Alura em parceria com a Google Cloud. O objetivo principal é realizar o **deploy automatizado de uma API FastAPI containerizada** na **Google Cloud Platform**, utilizando o **Cloud Run** e um pipeline de **CI/CD com GitHub Actions**.
-
----
-
-## 🛠 Tecnologias Utilizadas
-
-- Python + FastAPI
-- Docker
-- GitHub Actions
-- Google Cloud Platform:
-  - Cloud Run
-  - Artifact Registry
-  - Cloud Build (opcional)
-- Terraform (opcional)
+Este projeto implementa uma API REST para gerenciar alunos, cursos e matrículas em uma instituição de ensino. Utiliza **FastAPI** como framework principal, com deploy automatizado via **GitHub Actions** para o **Google Cloud Run**, e armazenamento de imagens no **Artifact Registry**.
 
 ---
 
-## 🎯 Objetivo
+## 🚀 Tecnologias Utilizadas
 
-Realizar o deploy automatizado da aplicação com CI/CD utilizando GitHub Actions + GCP, simulando um ambiente real de entrega contínua.
-
----
-
-## 📦 Etapas do Projeto
-
-- [x] Containerizar aplicação com Docker
-- [x] Configurar pipeline de CI/CD com GitHub Actions
-- [x] Autenticar no Google Cloud
-- [x] Criar repositório no Artifact Registry
-- [x] Fazer build e push da imagem localmente
-- [x] Deploy no Cloud Run com imagem container
-- [ ] (Opcional) Provisionar recursos com Terraform
+* **FastAPI** — Framework moderno para APIs com Python
+* **Uvicorn** — Servidor ASGI de alto desempenho
+* **Google Cloud Run** — Plataforma gerenciada para containers
+* **Artifact Registry** — Armazenamento de imagens Docker
+* **GitHub Actions** — Pipeline de CI/CD automatizado
+* **Cloud Build** — Para build de imagens Docker
 
 ---
 
-## 📁 Estrutura do Repositório
+## 🏗️ Estrutura do Projeto
 
-```bash
-📁 api-deploy-gcp
-├── .github/
-│   └── workflows/
-│       └── deploy.yml
-├── app/
+```
+.
+├── app.py                   # Arquivo principal FastAPI
+├── routers/
+│   ├── alunos.py
+│   ├── cursos.py
+│   └── matriculas.py
+├── database.py              # Configuração do banco de dados
+├── requirements.txt
 ├── Dockerfile
-├── requirements.txt   
-├── docker-compose.yml
-├── .dockerignore
-├── .gitignore
-└── README.md
+└── .github/
+    └── workflows/
+        └── deploy.yml       # Pipeline CI/CD
 ```
 
-## 🔐 Autenticação no Google Cloud (manual)
+---
+
+## 🧪 Endpoints
+
+Após o deploy, acesse:
+
+* `GET /` → Mensagem de status da API
+* `GET /docs` → Documentação interativa Swagger
+* `GET /redoc` → Documentação Redoc
+
+Rotas adicionais:
+
+* `/alunos` — CRUD de alunos
+* `/cursos` — CRUD de cursos
+* `/matriculas` — CRUD de matrículas
+
+---
+
+## 🔁 Deploy Automatizado (CI/CD)
+
+O deploy ocorre automaticamente ao realizar um push na branch `main`.
+
+### Fluxo de CI/CD via GitHub Actions:
+
+1. Autentica no Google Cloud usando uma chave secreta (JSON)
+2. Constrói a imagem Docker e envia ao Artifact Registry
+3. Faz o deploy no Cloud Run com `--allow-unauthenticated`
+4. Garante acesso público com `add-iam-policy-binding`
+
+> 🔐 A chave JSON está armazenada no GitHub Secrets como `GCLOUD_SERVICE_KEY`.
+
+---
+
+## 📋 Checklist de Provisionamento Manual (Pré-CI/CD)
+
+Antes de realizar o commit que dispara o pipeline, é necessário:
+
+### ✅ Etapas realizadas via interface do Google Cloud:
+
+* [x] **Criar projeto** via Console
+* [x] **Atribuir papéis ao usuário**, como:
+
+  * Administrador da organização
+  * Editor ou Administrador de Projeto
+  * Administrador do Cloud Run (`roles/run.admin`)
+* [x] **Criar chave JSON** de uma conta de serviço
+* [x] **Adicionar a chave no GitHub Secrets** como `GCLOUD_SERVICE_KEY`
+
+### ✅ Ativar APIs no projeto:
+
 ```bash
-gcloud auth login
-gcloud config set project imersao-devops-api
-```
-
-## ☁️ Deploy com Cloud Build (opcional - usando --source .)
-```bash
-gcloud run deploy --source . --port=8000 --region us-central1 --allow-unauthenticated --project imersao-devops-api
-```
-
-## ❌ Possível erro:
-```bash
-ERROR: (gcloud.run.deploy) PERMISSION_DENIED: Build failed because the service account is missing required IAM permissions.
-```
-
-## 🔧 Solução:
-Conceda permissões à conta de serviço do Cloud Build:
-
-```bash
-gcloud projects add-iam-policy-binding imersao-devops-api --member="serviceAccount:1034286558722@cloudbuild.gserviceaccount.com" --role="roles/run.admin"
-
-gcloud projects add-iam-policy-binding imersao-devops-api --member="serviceAccount:1034286558722@cloudbuild.gserviceaccount.com" --role="roles/artifactregistry.writer"
-```
-
-### ✅ Deploy recomendado: Build local + Push para Artifact Registry + Deploy via imagem
-
-1. Ative o Artifact Registry
-bash
+gcloud services enable cloudbuild.googleapis.com
+gcloud services enable run.googleapis.com
+gcloud services enable cloudresourcemanager.googleapis.com
 gcloud services enable artifactregistry.googleapis.com
+```
 
-2. Crie o repositório Docker
-bash
-gcloud artifacts repositories create containers --repository-format=docker --location=us-central1  --description="Repositório de containers da aplicação"
+### ✅ Commit final
 
-3. Faça o build da imagem localmente
-bash
-docker build -t us-central1-docker.pkg.dev/imersao-devops-api/containers/api:v1 .
+Após essas configurações, basta fazer um `git commit` com alteração no projeto para disparar o pipeline e concluir o deploy.
 
-4. Autentique o Docker com o GCP
-bash
-gcloud auth configure-docker us-central1-docker.pkg.dev
+---
 
-5. Faça o push da imagem
-bash
-docker push us-central1-docker.pkg.dev/imersao-devops-api/containers/api:v1
+## 🐳 Docker
 
-6. Deploy no Cloud Run
-bash
-gcloud run deploy api \
-  --image us-central1-docker.pkg.dev/imersao-devops-api/containers/api:v1 \
-  --region us-central1 \
-  --platform managed \
-  --allow-unauthenticated
+### Dockerfile
 
-7. Verifique o endpoint gerado
-text
-Service [api] revision [api-xxxx] has been deployed and is serving 100 percent of traffic at:
-https://api-xxxxx-uc.a.run.app
-Acesse esse link no navegador ou teste com curl.
+```dockerfile
+FROM python:3.10-slim
 
-🔁 GitHub Actions CI/CD
-O deploy automatizado está configurado via GitHub Actions em .github/workflows/deploy.yml, que:
+WORKDIR /app
 
-Faz build da imagem Docker
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-Faz push para o Artifact Registry
+COPY . .
 
-Faz deploy no Cloud Run
+EXPOSE 8080
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
+```
 
-Verifique se os segredos GCP_SA_KEY, GCP_PROJECT_ID e GCP_REGION estão configurados no GitHub (Settings > Secrets and variables > Actions).
+---
 
-✅ Vantagens da abordagem com imagem
-Item	Benefício
-Build local	Fácil de identificar e corrigir erros no Dockerfile
-Push para ArtifactRegistry	Controle de versões de imagens
-Deploy mais rápido	Sem depender do Cloud Build
-Fluxo realista de DevOps	Usado em ambientes com GitLab/GitHub CI/CD
+## ☕ Comandos GCP Essenciais
 
-📌 Projeto GCP usado
-ID do Projeto: imersao-devops-api
-Região: us-central1
+### Criar repositório no Artifact Registry:
 
-📚 Recursos adicionais
-Documentação oficial Cloud Run
+```bash
+gcloud artifacts repositories create api-docker \
+  --repository-format=docker \
+  --location=us-central1 \
+  --description="Repositório Docker para API"
+```
 
-FastAPI Docs
+### Atribuir permissão pública ao serviço:
 
-Google Cloud CLI
+```bash
+gcloud run services add-iam-policy-binding api-devops \
+  --member="allUsers" \
+  --role="roles/run.invoker" \
+  --region=us-central1 \
+  --platform=managed
+```
 
-Alura - Imersão Cloud DevOps
+---
 
-👨‍💻 Autor
-Projeto realizado como parte da Imersão Cloud DevOps (Alura + Google Cloud).
-Para fins de estudo, portfólio e prática de deploy automatizado com ferramentas modernas de DevOps.
+## 🧱 Erros Enfrentados e Soluções
 
+### ❌ Erro 1: `PERMISSION_DENIED` ao executar `add-iam-policy-binding`
 
-gcloud projects add-iam-policy-binding imersao-devops-api --member="serviceAccount:github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com" --role="roles/artifactregistry.writer"
-### INTERFACE WEB GCP
+* **Causa**: A conta de serviço usada no CI/CD não tinha o papel `roles/run.admin`
+* **Solução**: Atribuir `Cloud Run Admin` à conta de serviço no IAM
 
-## Configure o segredo no GitHub novamente
-Crie um novo:
-Nome: GCP_SA_KEY
-Valor: cole todo o conteúdo do novo JSON (inclusive {})
+### ❌ Erro 2: `403 Forbidden` ao acessar a URL do Cloud Run
 
+* **Causa**: A política IAM do serviço exigia autenticação
+* **Solução**: Garantir o uso de `--allow-unauthenticated` e adicionar binding IAM com `roles/run.invoker`
 
-Confirme que os outros secrets estão ok
-GCP_PROJECT_ID → deve ser imersao-devops-api
-GCP_REGION → ex: southamerica-east1
+### ❌ Erro 3: Build travava no `gcloud builds submit`
 
-# Após recriar as credenciais mesmo erro de permissão
+* **Causa**: APIs gcloud services enable cloudbuild.googleapis.com não habilitadas
+* **Solução**: ativar APIs e monitorar logs pelo console do Cloud Build
 
-PROJECT_ID="imersao-devops-api"
-SA_EMAIL="github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com"
+---
 
-# Escrita no Artifact Registry
-gcloud projects add-iam-policy-binding imersao-devops-api  --member="serviceAccount:github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com"  --role="roles/artifactregistry.writer"
+## 💬 Commits Sugeridos
 
-# Permissão para gerenciar Cloud Run
-gcloud projects add-iam-policy-binding imersao-devops-api  --member="serviceAccount:github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com" --role="roles/run.admin"
+* `feat: adiciona rota '/' para exibir status da API`
+* `chore(ci): permite acesso público via IAM no Cloud Run`
+* `fix: corrige permissão da conta de serviço no deploy`
+* `ci: adiciona etapa de deploy no Cloud Run via GitHub Actions`
 
-# Permissão para atuar como conta de serviço
-gcloud projects add-iam-policy-binding imersao-devops-api --member="serviceAccount:github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com"  --role="roles/iam.serviceAccountUser"
+---
 
+## ✅ Resultado Final
 
+✅ API publicada com sucesso no **Google Cloud Run**
+✅ Deploy automatizado com **CI/CD**
+✅ Requisições públicas liberadas com sucesso
+✅ Pronto para produção, integração com banco e escalabilidade
 
-PROJECT_ID="imersao-devops-api"
-GITHUB_SA="github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com"
-COMPUTE_SA="$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")-compute@developer.gserviceaccount.com"
+---
 
-gcloud iam service-accounts add-iam-policy-binding $COMPUTE_SA \
-  --member="serviceAccount:$GITHUB_SA" \
-  --role="roles/iam.serviceAccountUser" \
-  --project=$PROJECT_ID
+## 👨‍💻 Autor
 
-
-## ❌Erro no deploy
-
-✅ Tradução:
-O GitHub Actions conseguiu autenticar com sua conta de serviço, mas ela não tem permissão para usar outra conta de serviço, que é a usada pelo Cloud Run por padrão (PROJECT_NUMBER-compute@developer.gserviceaccount.com).
-
-
-✅ Solução: conceder roles/iam.serviceAccountUser
-Execute este comando no terminal:
-
-bash
-PROJECT_ID="imersao-devops-api"
-GITHUB_SA="github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com"
-COMPUTE_SA="$(gcloud projects describe $imersao-devops-api --format="value(projectNumber)")-compute@developer.gserviceaccount.com"
-
-gcloud iam service-accounts add-iam-policy-binding (gcloud projects describe $imersao-devops-api --format="value(projectNumber)")-compute@developer.gserviceaccount.com --member="serviceAccount:github-actions-deployer@imersao-devops-api.iam.gserviceaccount.com" --role="roles/iam.serviceAccountUser" --project=$imersao-devops-api
-
-1034286558722-compute@developer.gserviceaccount.com
+Projeto desenvolvido por **Ronayrton** durante experimentos com CI/CD na GCP usando GitHub Actions, FastAPI e Cloud Run.
