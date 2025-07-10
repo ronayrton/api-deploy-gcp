@@ -37,11 +37,5 @@ jobs:
             --platform managed \
             --allow-unauthenticated
 
-      - name: Permitir invocações públicas ao Cloud Run
-        run: |
-          gcloud run services add-iam-policy-binding api-devops \
-            --member="allUsers" \
-            --role="roles/run.invoker" \
-            --region=us-central1 \
-            --platform=managed
+      
 
