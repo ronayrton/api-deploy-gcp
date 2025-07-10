@@ -14,7 +14,7 @@ app = FastAPI(
         
         Permite realizar diferentes operações em cada uma dessas entidades.
     """, 
-    version="1.0.0",
+    version="1.0.0 - Teste de CI/CD com FastAPI e Google Cloud Run",
 )
 
 app.include_router(alunos_router, tags=["alunos"])
