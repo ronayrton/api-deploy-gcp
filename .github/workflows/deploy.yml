@@ -22,17 +22,17 @@ jobs:
       - name: Configurar o gcloud
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: api-devops-ronayrton
+          project_id: precise-works-465518-t3
           install_components: 'beta'
 
       - name: Enviar imagem para Artifact Registry
         run: |
-          gcloud builds submit --tag us-central1-docker.pkg.dev/api-devops-ronayrton/api-docker/api:latest
+          gcloud builds submit --tag us-central1-docker.pkg.dev/precise-works-465518-t3/api-docker/api:latest
 
       - name: Fazer deploy no Cloud Run
         run: |
           gcloud run deploy api-devops \
-            --image us-central1-docker.pkg.dev/api-devops-ronayrton/api-docker/api:latest \
+            --image us-central1-docker.pkg.dev/precise-works-465518-t3/api-docker/api:latest \
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated
